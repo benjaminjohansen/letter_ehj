@@ -13,7 +13,7 @@ data_baseline <- ISLR2::Publication
 # Number of participants
 n_total <- base::nrow(data_baseline)
 # Number of independent variables
-n_variables <- base::ncol(data) - 2
+n_variables <- base::ncol(data_baseline) - 2
 
 # Helper functions --------------------------------------------------------
 # Function to calculate number of events per variable
@@ -88,6 +88,7 @@ EPV_b <- events_per_variable(b$status_cens, n_variables)
 EPV_c <- events_per_variable(c$status_cens, n_variables)
 EPV_d <- events_per_variable(d$status_cens, n_variables)
 
+# Count number of events
 events_baseline <- sum(data$status)
 events_a <- sum(a$status_cens)
 events_b <- sum(b$status_cens)
@@ -109,15 +110,18 @@ output <- tibble::tibble(
   cens = c("Account for censoring", "Account for censoring", "Ignore censoring", "Ignore censoring")
 )
 
+
+# generate output tables --------------------------------------------------
 gt_tbl <- gt::gt(
   output[1:3, ],
   rowname_col = "scenario",
-  groupname_col = "cens") |>
+  groupname_col = "cens"
+) |>
   gt::tab_header(
     title = "Different scenarios for converting survival data into binary data",
     subtitle = "Based on a follow up time at 20 months"
   ) |>
-  cols_label(
+  gt::cols_label(
     explanation = "Scenario",
     incidence = "Incidence rate (per person month)",
     censoring = "Censoring rate (proportion of censored events)",
@@ -126,7 +130,7 @@ gt_tbl <- gt::gt(
   ) |>
   gt::fmt_number(
     decimals = 3,
-drop_trailing_zeros = TRUE
+    drop_trailing_zeros = TRUE
   ) |>
   gt::tab_source_note(
     source_note = md("Source: Gordon, Taddei-Peters, Mascette, Antman, Kaufmann, and Lauer. Publication of trials funded by the National Heart, Lung, and Blood Institute. New England Journal of Medicine, 369(20):1926-1934, 2013")
@@ -134,8 +138,11 @@ drop_trailing_zeros = TRUE
   gt::tab_source_note(
     source_note = md("Reference: James, G., Witten, D., Hastie, T., and Tibshirani, R. (2021) An Introduction to Statistical Learning with applications in R, Second Edition, https://www.statlearning.com, Springer-Verlag, New York")
   )
-
-
+# View table
 gt_tbl
 
-gt::gtsave(gt_tbl, filename = "results_table.png", path = base::paste(base::getwd(), "output", sep = "/"))
+# Save table to output folder
+gt::gtsave(gt_tbl,
+  filename = "results_table.png",
+  path = base::paste(base::getwd(), "output", sep = "/")
+)
